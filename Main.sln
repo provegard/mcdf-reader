@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McdfReader", "src\McdfReader\McdfReader.csproj", "{33B2052B-3DE2-4CAD-8164-0D1BCF61994D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test projects", "Test projects", "{6B6F054A-B382-4149-81A0-889A794F4DB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McdfReader.Test", "test\McdfReader.Test\McdfReader.Test.csproj", "{0CFF6892-B544-4C2F-AAB9-15E1D6733A31}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33B2052B-3DE2-4CAD-8164-0D1BCF61994D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33B2052B-3DE2-4CAD-8164-0D1BCF61994D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33B2052B-3DE2-4CAD-8164-0D1BCF61994D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33B2052B-3DE2-4CAD-8164-0D1BCF61994D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CFF6892-B544-4C2F-AAB9-15E1D6733A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CFF6892-B544-4C2F-AAB9-15E1D6733A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CFF6892-B544-4C2F-AAB9-15E1D6733A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CFF6892-B544-4C2F-AAB9-15E1D6733A31}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0CFF6892-B544-4C2F-AAB9-15E1D6733A31} = {6B6F054A-B382-4149-81A0-889A794F4DB7}
+	EndGlobalSection
+EndGlobal
