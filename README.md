@@ -1,5 +1,7 @@
 # mcdf-reader
 
+[![Tests](https://github.com/provegard/mcdf-reader/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/provegard/mcdf-reader/actions/workflows/tests.yml)
+
 A C# library for reading Microsoft Compound Document files.
 
 ## Related work
