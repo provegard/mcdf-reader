@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace McdfReader
 {
     public class Header
     {
+        private readonly uint[] _difat;
         private const ulong ExpectedFileId = 0xE11AB1A1E011CFD0;
         private const ushort LittleEndianByteOrder = 0xFFFE;
         
@@ -58,7 +62,24 @@ namespace McdfReader
             ValidateDirectorySectorCount();
             
             FATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+            
             FirstDirectorySectorSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            
+            // Ignore Transaction Signature Number for now
+            _ = NextBytes(4);
+
+            // TODO: Unit-test below
+            
+            MiniStreamCutoffSize = BitConverter.ToUInt32(span[NextBytes(4)]);
+            ValidateMiniStreamCutoffSize();
+            
+            FirstMiniFATSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            MiniFATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+            FirstDIFATSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            DIFATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+
+            var difatBytes = span[NextBytes(436)];
+            _difat = ReadDIFAT(ref difatBytes);
 
             Range NextBytes(int len)
             {
@@ -66,6 +87,15 @@ namespace McdfReader
                 offset += len;
                 return range;
             }
+        }
+
+        private uint[] ReadDIFAT(ref ReadOnlySpan<byte> difatBytes)
+            => SectorUtil.ReadSectorNumbers(ref difatBytes);
+
+        private void ValidateMiniStreamCutoffSize()
+        {
+            if (MiniStreamCutoffSize != 4096)
+                throw new McdfException($"Mini stream cutoff size must be 4096, found {MiniStreamCutoffSize}");
         }
 
         private void ValidateDirectorySectorCount()
@@ -127,5 +157,32 @@ namespace McdfReader
         /// Sector number of the first directory sector.
         /// </summary>
         public uint FirstDirectorySectorSectorNumber { get; }
+        
+        /// <summary>
+        /// Maximum size of a mini stream. Is always 4096.
+        /// </summary>
+        public uint MiniStreamCutoffSize { get; }
+        
+        /// <summary>
+        /// Sector number of the first sector of the mini File Allocation Table.
+        /// </summary>
+        public uint FirstMiniFATSectorNumber { get; }
+        
+        /// <summary>
+        /// Sector count of the mini File Allocation Table.
+        /// </summary>
+        public uint MiniFATSectorCount { get; }
+        
+        /// <summary>
+        /// Sector number of the first sector of the DIFAT.
+        /// </summary>
+        public uint FirstDIFATSectorNumber { get; }
+        
+        /// <summary>
+        /// Sector count of the DIFAT.
+        /// </summary>
+        public uint DIFATSectorCount { get; }
+
+        public ReadOnlyCollection<uint> DIFAT => Array.AsReadOnly(_difat);
     }
 }

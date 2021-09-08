@@ -116,6 +116,7 @@ namespace McdfReader.Test
             Array.Copy(new byte[] { 0x0C, 0x00 }, 0, data, 30, 2);
             Array.Copy(new byte[] { 0x06, 0x00 }, 0, data, 32, 2);
             Array.Copy(new byte[] { 0x01, 0x00, 0x00, 0x00 }, 0, data, 40, 4);
+            Array.Copy(new byte[] { 0x00, 0x10, 0x00, 0x00 }, 0, data, 56, 4);
             
             var mem = new ReadOnlyMemory<byte>(data);
             var header = new Header(mem);
