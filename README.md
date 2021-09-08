@@ -9,7 +9,7 @@ A C# library for reading Microsoft Compound Document files.
 * [OpenMcdf](https://github.com/ironfede/openmcdf)
 * [OpenMcdf-2](https://github.com/CodeCavePro/OpenMCDF)
 
-I found both of these to be buggy, in particular when it came to reading OLE property streams.
+I found both of these to be buggy, in particular when it comes to reading OLE property streams.
 
 ## Limitations
 
