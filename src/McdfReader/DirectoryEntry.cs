@@ -15,9 +15,8 @@ namespace McdfReader
     {
         internal const int Size = 128;
 
-        internal DirectoryEntry(ReadOnlyMemory<byte> entryData, uint id)
+        internal DirectoryEntry(ReadOnlyMemory<byte> entryData)
         {
-            ID = id;
             var span = entryData.Span;
             var entryNameBytes = span[..64].ToArray();
 
@@ -53,11 +52,6 @@ namespace McdfReader
                 throw new McdfException($"Name length must be at most 64, found {nameLength}");
         }
 
-        /// <summary>
-        /// The stream ID of this entry. The ID of the root entry is 0.
-        /// </summary>
-        public uint ID { get; }
-        
         internal string Name { get; }
         internal ObjectType ObjectType { get; }
         
@@ -67,7 +61,7 @@ namespace McdfReader
 
         public override string ToString()
         {
-            return $"'{Name}' ({ObjectType}) (this = {ID}, left = {LeftSiblingID}, right = {RightSiblingID}, child = {ChildID}";
+            return $"'{Name}' ({ObjectType}) (left = {LeftSiblingID}, right = {RightSiblingID}, child = {ChildID}";
         }
     }
 }

@@ -27,16 +27,6 @@ namespace McdfReader.Test
             Assert.That(entry.Name, Is.EqualTo(""));
         }
         
-        [Test]
-        public void Sets_ID()
-        {
-            var data = DataWithName("abc");
-            
-            var entry = Entry(data, 42u);
-            
-            Assert.That(entry.ID, Is.EqualTo(42u));
-        }
-        
         [TestCase(0, ObjectType.UnknownOrUnallocated)]
         [TestCase(1, ObjectType.StorageObject)]
         [TestCase(2, ObjectType.StreamObject)]
@@ -98,10 +88,10 @@ namespace McdfReader.Test
             });
         }
 
-        private DirectoryEntry Entry(byte[] data, uint id = 0u)
+        private DirectoryEntry Entry(byte[] data)
         {
             var mem = new ReadOnlyMemory<byte>(data);
-            return new DirectoryEntry(mem, id);
+            return new DirectoryEntry(mem);
         }
 
         private byte[] EmptyData() => new byte[DirectoryEntry.Size];
