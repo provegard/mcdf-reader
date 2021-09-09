@@ -1,6 +1,6 @@
 using System;
-using System.Text;
 using NUnit.Framework;
+using static McdfReader.Test.DirectoryEntryTestUtil;
 
 namespace McdfReader.Test
 {
@@ -86,28 +86,6 @@ namespace McdfReader.Test
                 var ex = Assert.Catch<McdfException>(() => Entry(data));
                 Assert.That(ex?.Message, Is.EqualTo("Name length must be at most 64, found 65"));
             });
-        }
-
-        private DirectoryEntry Entry(byte[] data)
-        {
-            var mem = new ReadOnlyMemory<byte>(data);
-            return new DirectoryEntry(mem);
-        }
-
-        private byte[] EmptyData() => new byte[DirectoryEntry.Size];
-
-        private byte[] DataWithName(string name)
-        {
-            var data = EmptyData();
-            var bytes = Encoding.Unicode.GetBytes(name);
-            
-            Array.Copy(bytes, 0, data, 0, bytes.Length);
-
-            var len = (ushort) (bytes.Length + 2); // 2 is null termination bytes
-            var lenBytes = BitConverter.GetBytes(len);
-            Array.Copy(lenBytes, 0, data, 64, 2);
-
-            return data;
         }
     }
 }
