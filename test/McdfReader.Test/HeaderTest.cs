@@ -116,10 +116,30 @@ namespace McdfReader.Test
             Array.Copy(new byte[] { 0x0C, 0x00 }, 0, data, 30, 2);
             Array.Copy(new byte[] { 0x06, 0x00 }, 0, data, 32, 2);
             Array.Copy(new byte[] { 0x01, 0x00, 0x00, 0x00 }, 0, data, 40, 4);
+            Array.Copy(new byte[] { 0x00, 0x10, 0x00, 0x00 }, 0, data, 56, 4);
             
             var mem = new ReadOnlyMemory<byte>(data);
             var header = new Header(mem);
             Assert.That(header.DirectorySectorCount, Is.EqualTo(1));
+        }
+        
+        [Test]
+        public void Rejects_invalid_mini_stream_cutoff_size()
+        {
+            var data = HeaderDataWithFileId();
+            Array.Copy(new byte[] { 0xFE, 0xFF }, 0, data, 28, 2);
+            Array.Copy(new byte[] { 0x04, 0x00 }, 0, data, 26, 2);
+            Array.Copy(new byte[] { 0x0C, 0x00 }, 0, data, 30, 2);
+            Array.Copy(new byte[] { 0x06, 0x00 }, 0, data, 32, 2);
+            Array.Copy(new byte[] { 0x01, 0x00, 0x00, 0x00 }, 0, data, 40, 4);
+            Array.Copy(new byte[] { 0x00, 0x08, 0x00, 0x00 }, 0, data, 56, 4);
+            
+            var mem = new ReadOnlyMemory<byte>(data);
+            Assert.Multiple(() =>
+            {
+                var ex = Assert.Catch<McdfException>(() => _ = new Header(mem));
+                Assert.That(ex?.Message, Is.EqualTo("Mini stream cutoff size must be 4096, found 2048"));
+            });
         }
 
         private byte[] HeaderDataWithFileId()

@@ -1,13 +1,15 @@
 using System;
+using System.Collections.ObjectModel;
 
 namespace McdfReader
 {
-    public class Header
+    internal class Header
     {
+        private readonly uint[] _difat;
         private const ulong ExpectedFileId = 0xE11AB1A1E011CFD0;
         private const ushort LittleEndianByteOrder = 0xFFFE;
         
-        public Header(ReadOnlyMemory<byte> headerData)
+        internal Header(ReadOnlyMemory<byte> headerData)
         {
             if (!BitConverter.IsLittleEndian)
                 throw new NotSupportedException("Only little-endian systems are supported");
@@ -58,7 +60,24 @@ namespace McdfReader
             ValidateDirectorySectorCount();
             
             FATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+            
             FirstDirectorySectorSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            
+            // Ignore Transaction Signature Number for now
+            _ = NextBytes(4);
+
+            // TODO: Unit-test below
+            
+            MiniStreamCutoffSize = BitConverter.ToUInt32(span[NextBytes(4)]);
+            ValidateMiniStreamCutoffSize();
+            
+            FirstMiniFATSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            MiniFATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+            FirstDIFATSectorNumber = BitConverter.ToUInt32(span[NextBytes(4)]);
+            DIFATSectorCount = BitConverter.ToUInt32(span[NextBytes(4)]);
+
+            var difatBytes = span[NextBytes(436)];
+            _difat = ReadDIFAT(ref difatBytes);
 
             Range NextBytes(int len)
             {
@@ -66,6 +85,15 @@ namespace McdfReader
                 offset += len;
                 return range;
             }
+        }
+
+        private uint[] ReadDIFAT(ref ReadOnlySpan<byte> difatBytes)
+            => SectorUtil.ReadSectorNumbers(ref difatBytes);
+
+        private void ValidateMiniStreamCutoffSize()
+        {
+            if (MiniStreamCutoffSize != 4096)
+                throw new McdfException($"Mini stream cutoff size must be 4096, found {MiniStreamCutoffSize}");
         }
 
         private void ValidateDirectorySectorCount()
@@ -96,36 +124,63 @@ namespace McdfReader
         /// <summary>
         /// File revision, is usually 0x3E (62).
         /// </summary>
-        public ushort Revision { get; }
+        internal ushort Revision { get; }
         
         /// <summary>
         /// File version, is always 3 or 4.
         /// </summary>
-        public ushort Version { get; }
+        internal ushort Version { get; }
         
         /// <summary>
         /// Sector size of regular streams. Is always 512 for version 3 files and 4096 for version 4 files.
         /// </summary>
-        public int SectorSize { get; }
+        internal int SectorSize { get; }
         
         /// <summary>
         /// Sector size of mini streams. Is always 64.
         /// </summary>
-        public int MiniSectorSize { get; }
+        internal int MiniSectorSize { get; }
         
         /// <summary>
         /// Sector count of the directory. Is always 0 for version 3 files.
         /// </summary>
-        public uint DirectorySectorCount { get; }
+        internal uint DirectorySectorCount { get; }
         
         /// <summary>
         /// Sector count of the File Allocation Table.
         /// </summary>
-        public uint FATSectorCount { get; }
+        internal uint FATSectorCount { get; }
 
         /// <summary>
         /// Sector number of the first directory sector.
         /// </summary>
-        public uint FirstDirectorySectorSectorNumber { get; }
+        internal uint FirstDirectorySectorSectorNumber { get; }
+        
+        /// <summary>
+        /// Maximum size of a mini stream. Is always 4096.
+        /// </summary>
+        internal uint MiniStreamCutoffSize { get; }
+        
+        /// <summary>
+        /// Sector number of the first sector of the mini File Allocation Table.
+        /// </summary>
+        internal uint FirstMiniFATSectorNumber { get; }
+        
+        /// <summary>
+        /// Sector count of the mini File Allocation Table.
+        /// </summary>
+        internal uint MiniFATSectorCount { get; }
+        
+        /// <summary>
+        /// Sector number of the first sector of the DIFAT.
+        /// </summary>
+        internal uint FirstDIFATSectorNumber { get; }
+        
+        /// <summary>
+        /// Sector count of the DIFAT.
+        /// </summary>
+        internal uint DIFATSectorCount { get; }
+
+        internal ReadOnlyCollection<uint> DIFAT => Array.AsReadOnly(_difat);
     }
 }
