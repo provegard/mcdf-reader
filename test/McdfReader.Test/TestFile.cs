@@ -3,6 +3,7 @@ using System.IO;
 
 namespace McdfReader.Test
 {
+    using Directory=System.IO.Directory;
     internal class TestFile
     {
         internal static readonly TestFile HelloWorldDoc = new("hello-world.doc");
